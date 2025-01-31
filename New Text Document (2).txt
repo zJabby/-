@@ -1,0 +1,94 @@
+#define rainSensor 2 
+#define IdrSensor 3
+#define Sw1_PIN 4
+#define Sw2_PIN 5
+#define R_EN 8 //กำหนดชื่อ R_EN = Pin 8
+#define RPWM 9 //กำหนดชื่อ RPWM = Pin 9
+#define L_EN 10 // กำหนดชื่อ L_EN = Pin 10
+#define LPWM 11// กำหนดชื่อ LPWM = Pin 11
+
+int valueRain;
+int valueLDR;
+int valueSw1;
+int valueSw2;
+int Speed_RPWM = 200; // กำหนดความเร็วของมอเตอร์ 0-255
+int Speed_LPWM = 200; // กำหนดความเร็วของมอเตอร์ 0-255
+
+
+
+void setup() {
+
+Serial.begin(9600);
+pinMode(rainSensor,INPUT);
+pinMode(IdrSensor,INPUT);
+pinMode(Sw1_PIN,INPUT);
+pinMode(Sw2_PIN,INPUT);
+pinMode(R_EN,OUTPUT); //กำหนด Pinmode เป็น OUTPUT
+pinMode(RPWM,OUTPUT);
+pinMode(L_EN,OUTPUT);
+pinMode(LPWM,OUTPUT);
+digitalWrite(R_EN,HIGH); //Enable BTS7960
+digitalWrite(L_EN,HIGH); //Enable BTS7960
+
+}
+
+void loop(){
+  valueRain = digitalRead(rainSensor);
+  Serial.print("rainSensor = ");
+  Serial.println(valueRain);
+  valueLDR = digitalRead(IdrSensor);
+  Serial.print(" LDR = ");
+  Serial.println(valueLDR);
+  valueSw1 = digitalRead(Sw1_PIN);
+  valueSw2 = digitalRead(Sw2_PIN);
+
+  Serial.print("Sw1 =");
+  Serial.println(valueSw1);
+
+  Serial.print("Sw2 = ");
+  Serial.println(valueSw2);
+  Serial.println("");
+  delay(100);
+  forward();
+  //reverse();
+  if (valueRain == 0|| valueLDR ==1) //ตรวจสอบค่าน้ำฝน
+  {
+    reverse();
+
+  }else
+  {
+    forward(); 
+  }
+  delay(500);
+
+
+}
+void forward() //ฟังชั่น forward ตากผ้า
+{
+  while(digitalRead(Sw1_PIN) == HIGH)
+    {
+      analogWrite(RPWM, Speed_RPWM);
+      analogWrite(LPWM,LOW);
+      //Serial.println("forward");
+    }
+  digitalWrite(RPWM,LOW);
+  digitalWrite(LPWM,LOW);
+}
+void reverse() //ฟังชั่น reverse เก็บผ้า
+{
+  while(digitalRead(Sw2_PIN) == HIGH)
+    {
+      analogWrite(RPWM, LOW);
+      analogWrite(LPWM, Speed_RPWM);
+      //Serial.println(" reverse");
+    }
+  digitalWrite(RPWM,LOW);
+  digitalWrite(LPWM,LOW);
+
+}
+  
+
+
+
+
+
